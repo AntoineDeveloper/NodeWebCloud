@@ -1,6 +1,6 @@
 {
   "name": "nodewebcloud",
-  "version": "1.0.0-alpha1",
+  "version": "1.0.0-alpha2",
   "description": "A Comprehensive Web-Based File Server Solution with User Management, Built Using Node.js and MongoDB",
   "main": "server.js",
   "scripts": {
