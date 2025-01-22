@@ -44,6 +44,20 @@ We are always open to contributions and highly encourage them! If you have an id
 
 We will review your PR as soon as possible and will merge it if everything looks good. Thanks for contributing!
 
+## ⚠️ WARNING: HEAVY DEVELOPMENT IN PROGRESS ⚠️
+
+**This project is currently in HEAVY development and should be used with EXTREME CAUTION.**
+
+- **DO NOT** use this software in production environments yet. It is unstable and may have critical bugs.
+- **ALWAYS** make sure to have up-to-date backups of your data.
+- **EXPECTED BREAKAGES**: There will be significant changes to the functionality, architecture, and database schema, which could break compatibility with previous versions.
+- **USE AT YOUR OWN RISK**: We are not responsible for any data loss, system failures, or issues caused by using this project.
+  
+Proceed with caution, and remember: **backup, backup, backup!**
+
+We recommend testing the project in a controlled, non-production environment until it reaches a stable version.
+
+
 ## Prerequisites
 
 To run NodeWebCloud locally, ensure you have the following dependencies installed:
