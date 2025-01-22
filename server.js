@@ -21,7 +21,7 @@ var crypto = require("crypto"); // To encrypt strings
 const multer = require("multer");
 const bodyParser = require("body-parser");
 const moment = require("moment-timezone");
-const mime = require('mime-types'); // Import the mime-types module
+const mime = require("mime-types"); // Import the mime-types module
 
 // This is the secret for the user session tokens
 var usersJWTsecret = process.env.USERS_SECRET;
@@ -126,50 +126,50 @@ app.get("/dashboard", async (req, res) => {
 });
 
 app.get("/nopermission", async (req, res) => {
-    // Get cookies
-    var cookies = {};
-    req.headers.cookie &&
-      req.headers.cookie.split(";").forEach(function (cookie) {
-        var parts = cookie.split("=");
-        cookies[parts.shift().trim()] = (parts.join("=") || "").trim();
-      });
-    // Get token cookie
-    var NODEWEBCLOUD_TOKEN = cookies.NODEWEBCLOUD_TOKEN;
-  
-    // If token is undefined or null
-    if (!NODEWEBCLOUD_TOKEN) {
-      res.redirect("/login");
-      return;
-    }
-  
-    var verifyTokenResult = await verifyToken(NODEWEBCLOUD_TOKEN);
-  
-    if (verifyTokenResult === false) {
-      res.redirect("/login");
-      return;
-    } else {
-      try {
-        var userfound = await Users.findOne({ username: verifyTokenResult });
-        if (!userfound) {
-          res.redirect("/login");
-          return;
-        } else {
-          res.render("nopermission", {
-            data: {
-              user: {
-                fullname: userfound.fullname,
-                permissions: userfound.permissions,
-              },
+  // Get cookies
+  var cookies = {};
+  req.headers.cookie &&
+    req.headers.cookie.split(";").forEach(function (cookie) {
+      var parts = cookie.split("=");
+      cookies[parts.shift().trim()] = (parts.join("=") || "").trim();
+    });
+  // Get token cookie
+  var NODEWEBCLOUD_TOKEN = cookies.NODEWEBCLOUD_TOKEN;
+
+  // If token is undefined or null
+  if (!NODEWEBCLOUD_TOKEN) {
+    res.redirect("/login");
+    return;
+  }
+
+  var verifyTokenResult = await verifyToken(NODEWEBCLOUD_TOKEN);
+
+  if (verifyTokenResult === false) {
+    res.redirect("/login");
+    return;
+  } else {
+    try {
+      var userfound = await Users.findOne({ username: verifyTokenResult });
+      if (!userfound) {
+        res.redirect("/login");
+        return;
+      } else {
+        res.render("nopermission", {
+          data: {
+            user: {
+              fullname: userfound.fullname,
+              permissions: userfound.permissions,
             },
-          });
-        }
-      } catch (e) {
-        DisplayConsoleLog(
-          `An error occured with the ${req.route.path} route. ERR MSG: ${e.message}`
-        );
+          },
+        });
       }
+    } catch (e) {
+      DisplayConsoleLog(
+        `An error occured with the ${req.route.path} route. ERR MSG: ${e.message}`
+      );
     }
-  });
+  }
+});
 
 app.get("/files", async (req, res) => {
   // Get cookies
@@ -208,27 +208,27 @@ app.get("/files", async (req, res) => {
         }
 
         if (!FolderPath.endsWith("/")) {
-            res.status(400).send("Bad path request");
-            return;
+          res.status(400).send("Bad path request");
+          return;
         }
 
         // If we are not at the root path of the user
-        if ((FolderPath.split("/").length - 1) > 1) {
-            var PathSplit = FolderPath.split(`/`);
-            var PathSplitLastEntry = PathSplit[PathSplit.length - 2];
-            // Try to find the folder
-            var foundFolder = await Files.findOne({
-                owner: userfound._id,
-                path: `${FolderPath.split(`/`).slice(0, -2).join(`/`)}/`,
-                name: PathSplitLastEntry,
-                isFolder: true
-            });
-            console.log(foundFolder);
-            // If the folder is not there
-            if (!foundFolder) {
-                res.status(400).send("Bad path request");
-                return;
-            }
+        if (FolderPath.split("/").length - 1 > 1) {
+          var PathSplit = FolderPath.split(`/`);
+          var PathSplitLastEntry = PathSplit[PathSplit.length - 2];
+          // Try to find the folder
+          var foundFolder = await Files.findOne({
+            owner: userfound._id,
+            path: `${FolderPath.split(`/`).slice(0, -2).join(`/`)}/`,
+            name: PathSplitLastEntry,
+            isFolder: true,
+          });
+          console.log(foundFolder);
+          // If the folder is not there
+          if (!foundFolder) {
+            res.status(400).send("Bad path request");
+            return;
+          }
         }
 
         // Get all the files and folder that belong here
@@ -300,7 +300,7 @@ app.get("/users", async (req, res) => {
               fullname: userfound.fullname,
               permissions: userfound.permissions,
             },
-            AllUsers: AllUsers
+            AllUsers: AllUsers,
           },
         });
       }
@@ -313,64 +313,64 @@ app.get("/users", async (req, res) => {
 });
 
 app.get("/analytics", async (req, res) => {
-    // Get cookies
-    var cookies = {};
-    req.headers.cookie &&
-      req.headers.cookie.split(";").forEach(function (cookie) {
-        var parts = cookie.split("=");
-        cookies[parts.shift().trim()] = (parts.join("=") || "").trim();
-      });
-    // Get token cookie
-    var NODEWEBCLOUD_TOKEN = cookies.NODEWEBCLOUD_TOKEN;
-  
-    // If token is undefined or null
-    if (!NODEWEBCLOUD_TOKEN) {
-      res.redirect("/login");
-      return;
-    }
-  
-    var verifyTokenResult = await verifyToken(NODEWEBCLOUD_TOKEN);
-  
-    if (verifyTokenResult === false) {
-      res.redirect("/login");
-      return;
-    } else {
-      try {
-        var userfound = await Users.findOne({ username: verifyTokenResult });
-        if (!userfound) {
-          res.redirect("/login");
-          return;
-        } else {
-          // Check if the user has permissions
-          if (!userfound.permissions.includes("admin")) {
-            res.redirect("/nopermission");
-            return;
-          }
-  
-          // Get all the users
-          var AllUsers = await Users.find({});
+  // Get cookies
+  var cookies = {};
+  req.headers.cookie &&
+    req.headers.cookie.split(";").forEach(function (cookie) {
+      var parts = cookie.split("=");
+      cookies[parts.shift().trim()] = (parts.join("=") || "").trim();
+    });
+  // Get token cookie
+  var NODEWEBCLOUD_TOKEN = cookies.NODEWEBCLOUD_TOKEN;
 
-          // Get all files/folders
-            var AllFiles = await Files.find({});
-  
-          res.render("analytics", {
-            data: {
-              user: {
-                fullname: userfound.fullname,
-                permissions: userfound.permissions,
-              },
-              AllUsers: AllUsers,
-              AllFiles: AllFiles
-            },
-          });
+  // If token is undefined or null
+  if (!NODEWEBCLOUD_TOKEN) {
+    res.redirect("/login");
+    return;
+  }
+
+  var verifyTokenResult = await verifyToken(NODEWEBCLOUD_TOKEN);
+
+  if (verifyTokenResult === false) {
+    res.redirect("/login");
+    return;
+  } else {
+    try {
+      var userfound = await Users.findOne({ username: verifyTokenResult });
+      if (!userfound) {
+        res.redirect("/login");
+        return;
+      } else {
+        // Check if the user has permissions
+        if (!userfound.permissions.includes("admin")) {
+          res.redirect("/nopermission");
+          return;
         }
-      } catch (e) {
-        DisplayConsoleLog(
-          `An error occured with the ${req.route.path} route. ERR MSG: ${e.message}`
-        );
+
+        // Get all the users
+        var AllUsers = await Users.find({});
+
+        // Get all files/folders
+        var AllFiles = await Files.find({});
+
+        res.render("analytics", {
+          data: {
+            user: {
+              fullname: userfound.fullname,
+              permissions: userfound.permissions,
+            },
+            AllUsers: AllUsers,
+            AllFiles: AllFiles,
+          },
+        });
       }
+    } catch (e) {
+      DisplayConsoleLog(
+        `An error occured with the ${req.route.path} route. ERR MSG: ${e.message}`
+      );
     }
-  });
+  }
+});
 
 app.get("/viewer", async (req, res) => {
   // Get cookies
@@ -535,50 +535,60 @@ app.get("/file-raw/:fileName", async (req, res) => {
 });
 
 app.get("/permalink-raw/:userid/:fileid/:filename", async (req, res) => {
-    var userId = req.params.userid;
-    var fileid = req.params.fileid;
-    var filename = req.params.filename;
+  var userId = req.params.userid;
+  var fileid = req.params.fileid;
+  var filename = req.params.filename;
 
-    if (!userId || !fileid || !filename) {
-        res.status(400).send("Bad request");
-        return;
-    }
-
-  // Find the file in question
-  var FoundFile = await Files.findOne({
-    owner: userId,
-    _id: fileid,
-    name: filename,
-    isFolder: false,
-  });
-
-  if (!FoundFile) {
-    res.status(400).send("The file wasn't found on this server");
+  if (!userId || !fileid || !filename) {
+    res.status(400).send("Bad request");
     return;
   }
 
-  // Send the file
-  // Create the full path to the file
-  const filePath = path.join(__dirname, "files", FoundFile.path, FoundFile.name);
+  try {
+    // Find the file in question
+    var FoundFile = await Files.findOne({
+      owner: userId,
+      _id: fileid,
+      name: filename,
+      isFolder: false,
+    });
 
-  // Check if the file exists
-  if (fs.existsSync(filePath)) {
-    // Get the MIME type of the file based on its extension
-    const mimeType = mime.lookup(filePath);
-
-    if (mimeType) {
-      // Set the Content-Type header to the MIME type of the file
-      res.setHeader("Content-Type", mimeType);
-
-      // Send the file as a download
-      res.sendFile(filePath, (err) => {
-        if (err) {
-          console.error("Error sending file:", err);
-        }
-      });
-    } else {
-      res.status(415).send("Unsupported file type");
+    if (!FoundFile) {
+      res.status(400).send("The file wasn't found on this server");
+      return;
     }
+
+    // Send the file
+    // Create the full path to the file
+    const filePath = path.join(
+      __dirname,
+      "files",
+      FoundFile.path,
+      FoundFile.name
+    );
+
+    // Check if the file exists
+    if (fs.existsSync(filePath)) {
+      // Get the MIME type of the file based on its extension
+      const mimeType = mime.lookup(filePath);
+
+      if (mimeType) {
+        // Set the Content-Type header to the MIME type of the file
+        res.setHeader("Content-Type", mimeType);
+
+        // Send the file as a download
+        res.sendFile(filePath, (err) => {
+          if (err) {
+            console.error("Error sending file:", err);
+          }
+        });
+      } else {
+        res.status(415).send("Unsupported file type");
+      }
+    }
+  } catch (e) {
+    console.log(e.message);
+    res.status(500).send("Internal Server Error");
   }
 });
 
@@ -641,7 +651,7 @@ app.post("/api/upload-files", upload.array("files"), async (req, res) => {
     const newFolder = new Files({
       owner: user._id,
       name: req.body.path,
-      isFolder: true
+      isFolder: true,
     });
     // Save it
     await newFolder.save();
@@ -739,84 +749,89 @@ app.post("/api/create-folder", async (req, res) => {
 
 // API to delete a file or folder
 app.post("/api/delete", async (req, res) => {
-    // Parse cookies
-    var cookies = {};
-    req.headers.cookie &&
-      req.headers.cookie.split(";").forEach(function (cookie) {
-        var parts = cookie.split("=");
-        cookies[parts.shift().trim()] = (parts.join("=") || "").trim();
-      });
-    const NODEWEBCLOUD_TOKEN = cookies.NODEWEBCLOUD_TOKEN;
-  
-    // Check if token exists
-    if (!NODEWEBCLOUD_TOKEN) {
-      return res.status(401).json({ error: "Unauthorized. Please log in." });
+  // Parse cookies
+  var cookies = {};
+  req.headers.cookie &&
+    req.headers.cookie.split(";").forEach(function (cookie) {
+      var parts = cookie.split("=");
+      cookies[parts.shift().trim()] = (parts.join("=") || "").trim();
+    });
+  const NODEWEBCLOUD_TOKEN = cookies.NODEWEBCLOUD_TOKEN;
+
+  // Check if token exists
+  if (!NODEWEBCLOUD_TOKEN) {
+    return res.status(401).json({ error: "Unauthorized. Please log in." });
+  }
+
+  // Verify the token
+  const verifyTokenResult = await verifyToken(NODEWEBCLOUD_TOKEN);
+  if (!verifyTokenResult) {
+    return res.status(401).json({ error: "Invalid or expired token." });
+  }
+
+  // Find the user
+  const user = await Users.findOne({ username: verifyTokenResult });
+  if (!user) {
+    return res.status(401).json({ error: "User not found." });
+  }
+
+  // Validate the request body
+  const { FolderPath, FolderFileName } = req.body;
+  if (!FolderPath || !FolderFileName) {
+    return res.status(400).json({ error: "Missing required parameters." });
+  }
+
+  // Construct the full path
+  const fullPath = path.join(__dirname, "files", FolderPath, FolderFileName);
+
+  try {
+    const stats = fs.statSync(fullPath);
+
+    if (stats.isDirectory()) {
+      // Delete folder and its contents
+      deleteFolderRecursively(fullPath);
+
+      // Delete folder and its files from the database
+      await Files.deleteMany({
+        owner: user._id,
+        path: `${FolderPath}`,
+        name: FolderFileName,
+      }); // Delete the folder
+      await Files.deleteMany({
+        owner: user._id,
+        path: `${FolderPath}${FolderFileName}/`,
+      }); // Delete the files in the folder
+    } else if (stats.isFile()) {
+      // Delete file from the filesystem
+      fs.unlinkSync(fullPath);
+
+      // Delete the file from the database
+      await Files.deleteOne({ path: FolderPath, name: FolderFileName });
+    } else {
+      return res.status(400).json({ error: "Invalid target type." });
     }
-  
-    // Verify the token
-    const verifyTokenResult = await verifyToken(NODEWEBCLOUD_TOKEN);
-    if (!verifyTokenResult) {
-      return res.status(401).json({ error: "Invalid or expired token." });
-    }
-  
-    // Find the user
-    const user = await Users.findOne({ username: verifyTokenResult });
-    if (!user) {
-      return res.status(401).json({ error: "User not found." });
-    }
-  
-    // Validate the request body
-    const { FolderPath, FolderFileName } = req.body;
-    if (!FolderPath || !FolderFileName) {
-      return res.status(400).json({ error: "Missing required parameters." });
-    }
-  
-    // Construct the full path
-    const fullPath = path.join(__dirname, "files", FolderPath, FolderFileName);
-  
-    try {
-      const stats = fs.statSync(fullPath);
-  
-      if (stats.isDirectory()) {
-        // Delete folder and its contents
-        deleteFolderRecursively(fullPath);
-  
-        // Delete folder and its files from the database
-        await Files.deleteMany({ owner: user._id, path: `${FolderPath}`, name: FolderFileName }); // Delete the folder
-        await Files.deleteMany({ owner: user._id, path: `${FolderPath}${FolderFileName}/` }); // Delete the files in the folder
-      } else if (stats.isFile()) {
-        // Delete file from the filesystem
-        fs.unlinkSync(fullPath);
-  
-        // Delete the file from the database
-        await Files.deleteOne({ path: FolderPath, name: FolderFileName });
-      } else {
-        return res.status(400).json({ error: "Invalid target type." });
-      }
-  
-      res.status(200).json({ message: "Deleted successfully." });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "An error occurred while deleting." });
-    }
-  });
+
+    res.status(200).json({ message: "Deleted successfully." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "An error occurred while deleting." });
+  }
+});
 
 // Helper function to delete a folder recursively
 function deleteFolderRecursively(folderPath) {
-    if (fs.existsSync(folderPath)) {
-      fs.readdirSync(folderPath).forEach((file) => {
-        const currentPath = path.join(folderPath, file);
-        if (fs.lstatSync(currentPath).isDirectory()) {
-          deleteFolderRecursively(currentPath); // Recursively delete subfolders
-        } else {
-          fs.unlinkSync(currentPath); // Delete files
-        }
-      });
-      fs.rmdirSync(folderPath); // Delete the now-empty folder
-    }
+  if (fs.existsSync(folderPath)) {
+    fs.readdirSync(folderPath).forEach((file) => {
+      const currentPath = path.join(folderPath, file);
+      if (fs.lstatSync(currentPath).isDirectory()) {
+        deleteFolderRecursively(currentPath); // Recursively delete subfolders
+      } else {
+        fs.unlinkSync(currentPath); // Delete files
+      }
+    });
+    fs.rmdirSync(folderPath); // Delete the now-empty folder
   }
-
-
+}
 
 app.post("/api/createToken", multer().none(), async (req, res) => {
   if (!req.body) {
