@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - NodeWebCloud</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/public/assets/libraries/bootstrap.min.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <link rel="shortcut icon" href="/public/assets/logos/favicon.png" type="image/x-icon">
+
+    <!-- No index no follow -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="google" content="notranslate">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        .form-floating label {
+            color: #ddd;
+        }
+        .form-floating .form-control {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: none;
+        }
+        .form-floating .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.3);
+            box-shadow: none;
+            outline: none;
+        }
+        .btn-primary {
+            background-color: #6a11cb;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #2575fc;
+        }
+        .form-container hr {
+            border-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container text-center">
+        <h1 style="margin: 0px;font-size: 1.8rem;">NodeWebCloud</h1>
+        <p><a href="https://github.com/AntoineDeveloper/NodeWebCloud" style="color: white;">Self-Hosted File Server</a></p>
+        <h5 style="text-align: center;">Login</h5>
+        <hr>
+        <form id="loginForm">
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="username-node-web-cloud" name="username-node-web-cloud" placeholder="Username">
+                <label for="username-node-web-cloud">Username</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="password-node-web-cloud" name="password-node-web-cloud" placeholder="Password">
+                <label for="password-node-web-cloud">Password</label>
+            </div>
+            <input type="submit" value="Login" class="btn btn-primary w-100">
+        </form>
+    </div>
+    <script src="/public/assets/libraries/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+<script>
+    document.getElementById("loginForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        
+        var username = document.getElementById("username-node-web-cloud").value
+        var password = document.getElementById("password-node-web-cloud").value
+
+        getLoginTokenFromServer(username, password)
+    });
+
+    function getLoginTokenFromServer(username, password) {
+        var formData = new FormData();
+
+        formData.append("username", username);
+        formData.append("password", password);
+
+        // Send using fetch api using POST
+        const response = fetch("/api/createToken", {
+            method: "POST",
+            body: formData
+        }).then(response => response.text())
+            .then(data => {
+                // Try to parse
+                try {
+                    data = JSON.parse(data)
+
+                    if (data.status === "OK") {
+                        localStorage["NODEWEBCLOUD_TOKEN"] = data.token;
+                        // Add to cookies
+                        document.cookie = `NODEWEBCLOUD_TOKEN=${data.token}`;
+                        
+                        sucessLoggedIn()
+                    } else {
+                        failedMessage(data.message)
+                    }
+                } catch (e) {
+                    failedMessage("Le serveur ne répond pas...")
+                    return;
+                }
+            })
+    }
+
+    function sucessLoggedIn() {
+        // Redirect to main page
+        window.location = "/dashboard"
+    }
+
+    function failedMessage(message) {
+        alert(message)
+    }
+
+    // Function to completely delete a cookie
+    function deleteCookie(cookieName) {
+        var cookieDate = new Date(); // current date & time
+        cookieDate.setTime(cookieDate.getTime() - 1);
+        document.cookie = cookieName += "=; expires=" + cookieDate.toGMTString();
+    }
+
+    function logout() {
+        // Delete the cookie
+        var cookieDate = new Date(); // current date & time
+        cookieDate.setTime(cookieDate.getTime() - 1);
+        document.cookie = "NODEWEBCLOUD_TOKEN=; expires=" + cookieDate.toGMTString();
+
+        // Delete from localstorage
+        localStorage.removeItem("NODEWEBCLOUD_TOKEN")
+
+        window.location.href = "/login";
+    }
+</script>

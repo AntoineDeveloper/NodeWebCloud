@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>No Permission - NodeWebCloud</title>
+
+    <link
+      rel="stylesheet"
+      href="/public/assets/libraries/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+
+    <!-- Site favicon -->
+    <link
+      rel="shortcut icon"
+      href="/public/assets/logos/favicon.png"
+      type="image/x-icon"
+    />
+
+    <!-- No index no follow -->
+    <meta name="robots" content="noindex, nofollow" />
+
+    <meta name="google" content="notranslate" />
+
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+
+  <body style="background-color: rgb(31, 31, 31);color: white;">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <!-- Brand -->
+        <a class="navbar-brand" href="/"><i class="fas fa-folder text-warning"></i> NodeWebCloud</a>
+
+        <!-- Toggler for mobile view -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Links -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <!-- Dashboard -->
+            <li class="nav-item">
+              <a class="nav-link active" href="/dashboard">Dashboard</a>
+            </li>
+
+            <!-- Logout -->
+            <li class="nav-item">
+              <a class="nav-link text-danger" href="/logout">Logout (<%- data.user.fullname %>)</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container text-center">
+          <!-- Tab navigation with icons -->
+<div class="container mt-4 mb-4">
+    <ul class="nav nav-pills justify-content-center">
+      <!-- Files Tab -->
+      <li class="nav-item">
+        <a class="nav-link" href="/files">
+          <i class="fas fa-folder me-2"></i> Files
+        </a>
+      </li>
+  
+      <!-- Users Tab -->
+      <li class="nav-item">
+        <a class="nav-link" href="/users">
+          <i class="fas fa-users me-2"></i> Users
+        </a>
+      </li>
+  
+      <!-- Analytics Tab -->
+      <li class="nav-item">
+        <a class="nav-link" href="/analytics">
+          <i class="fas fa-chart-line me-2"></i> Analytics
+        </a>
+      </li>
+
+      <!-- Settings Tab -->
+      <li class="nav-item">
+        <a class="nav-link" href="/settings">
+          <i class="fas fa-cogs me-2"></i> Settings
+        </a>
+      </li>
+    </ul>
+  </div>
+  <hr>
+      <h1>No Permission</h1>
+      <p>You do not have permission to access this page.</p>
+      
+    <br /><br /><br />
+    <footer class="text-center">
+      <p>
+        Do not distribute without permission. <br>
+        <script>document.write(new Date().getFullYear())</script> AntoineDeveloper
+      </p>
+    </footer>
+    <script src="/public/assets/libraries/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
+
+<script>
+  function logout() {
+    // Delete the cookie
+    var cookieDate = new Date(); // current date & time
+    cookieDate.setTime(cookieDate.getTime() - 1);
+    document.cookie =
+      "NODEWEBCLOUD_TOKEN=; expires=" + cookieDate.toGMTString();
+
+    // Delete from localstorage
+    localStorage.removeItem("NODEWEBCLOUD_TOKEN");
+
+    window.location.href = "/login";
+  }
+</script>

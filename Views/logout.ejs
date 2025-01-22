@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Déconnexion en cours</title>
+  </head>
+  <body>
+    <h1>Déconnexion en cours</h1>
+
+    <script>
+      logout();
+      function logout() {
+        // Delete the cookie
+        var cookieDate = new Date(); // current date & time
+        cookieDate.setTime(cookieDate.getTime() - 1);
+        document.cookie =
+          "NODEWEBCLOUD_TOKEN=; expires=" + cookieDate.toGMTString();
+
+        // Delete from localstorage
+        localStorage.removeItem("NODEWEBCLOUD_TOKEN");
+
+        window.location.href = "/login";
+      }
+    </script>
+  </body>
+</html>
