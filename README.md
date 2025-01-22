@@ -63,9 +63,8 @@ We recommend testing the project in a controlled, non-production environment unt
 To run NodeWebCloud locally, ensure you have the following dependencies installed:
 
 - **Computer/Server/VM/LXC** With enough storage to fit your needs
-- **Node.js** (>=14.0.0)
+- **Node.js with NPM** (>=14.0.0)
 - **MongoDB** (either local or remote instance)
-- **npm** for package management
 
 ## Installation Guide
 
