@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Files - NodeWebCloud</title>
+
+    <link rel="stylesheet" href="/public/assets/libraries/bootstrap.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+
+    <!-- Site favicon -->
+    <link
+      rel="shortcut icon"
+      href="/public/assets/logos/favicon.png"
+      type="image/x-icon"
+    />
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- No index no follow -->
+    <meta name="robots" content="noindex, nofollow" />
+
+    <meta name="google" content="notranslate" />
+
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+      }
+
+      .grid-container-filesfolder-details {
+        display: grid;
+        grid-template-rows: 1fr 1fr 1fr;
+        gap: 5px;
+      }
+    </style>
+  </head>
+
+  <body style="background-color: rgb(31, 31, 31);color: white;">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <!-- Brand -->
+        <a class="navbar-brand" href="/"><i class="fas fa-folder text-warning"></i> NodeWebCloud</a>
+
+        <!-- Toggler for mobile view -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Links -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <!-- Dashboard -->
+            <li class="nav-item">
+              <a class="nav-link active" href="/dashboard">Dashboard</a>
+            </li>
+
+            <!-- Logout -->
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="/logout">Logout (<%- data.user.fullname %>)</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- Tab navigation with icons -->
+<div class="container mt-4">
+    <ul class="nav nav-pills justify-content-center">
+      <!-- Files Tab -->
+      <li class="nav-item">
+        <a class="nav-link active" href="/files">
+          <i class="fas fa-folder me-2"></i> Files
+        </a>
+      </li>
+  
+      <!-- Users Tab -->
+      <li class="nav-item">
+        <a class="nav-link" href="/users">
+          <i class="fas fa-users me-2"></i> Users
+        </a>
+      </li>
+  
+      <!-- Analytics Tab -->
+      <li class="nav-item">
+        <a class="nav-link" href="/analytics">
+          <i class="fas fa-chart-line me-2"></i> Analytics
+        </a>
+      </li>
+
+      <!-- Settings Tab -->
+      <li class="nav-item">
+        <a class="nav-link" href="/settings">
+          <i class="fas fa-cogs me-2"></i> Settings
+        </a>
+      </li>
+    </ul>
+  </div>
+    <div class="container mt-2">
+        <div class="d-flex align-items-center p-2 bg-light rounded shadow-sm">
+            <i class="fas fa-folder-open text-primary me-2"></i>
+            <span class="mb-0 text-muted">
+              <strong class="text-dark">PATH:</strong> <%= data.FolderPath %>
+            </span>
+        </div>          
+      <hr />
+
+      <div class="d-flex flex-wrap gap-3 mt-3">
+        <!-- Return to home button -->
+        <button
+          class="btn btn-outline-secondary px-4 py-2"
+          onclick="window.location.href = '/files'"
+        >
+          <i class="fas fa-home me-2"></i> Return to Home
+        </button>
+      
+        <!-- Upload files button -->
+        <button
+          class="btn btn-primary px-4 py-2"
+          onclick="StartUploadProcess()"
+        >
+          <i class="fas fa-upload me-2"></i> Upload Files
+        </button>
+      
+        <!-- Create folder button -->
+        <button
+          class="btn btn-success text-white px-4 py-2"
+          data-bs-toggle="modal"
+          data-bs-target="#createFolderModal"
+        >
+          <i class="fas fa-folder-plus me-2"></i> Create Folder
+        </button>
+      </div>
+      <br>      
+
+      <!-- List of files and folders -->
+<ul class="list-group">
+    <% if ((data.FolderPath.split("/").length - 1) > 1) { %>
+    <!-- Go Back -->
+    <li
+      class="list-group-item d-flex align-items-center bg-light rounded shadow-sm mb-2"
+      style="cursor: pointer"
+      onclick="window.location.href = '/files?path=<%= data.FolderPath.split(`/`).slice(0, -2).join(`/`); %>/'"
+    >
+      <i class="fas fa-arrow-left text-primary me-3"></i>
+      <span>Go back</span>
+    </li>
+    <% } %>
+  
+    <% data.filesAndFolders.forEach(item => { %>
+    <li
+      class="list-group-item d-flex align-items-center bg-white rounded shadow-sm mb-2"
+      style="cursor: pointer;"
+    >
+      <!-- Preview -->
+      <% if (['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', '.webp'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+             data-src="/file-raw/<%= item.name %>?path=<%= data.FolderPath %>" 
+             width="80" 
+             height="80" 
+             alt="<%= item.name %>" />
+      <% } else if (['.mp4', '.webm', '.ogg', '.ogv'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <video class="lazy-load rounded" 
+               data-src="/file-raw/<%= item.name %>?path=<%= data.FolderPath %>" 
+               width="80" 
+               height="80" 
+               muted>
+        </video>
+      <% } else if (['.pdf', '.txt'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <iframe class="lazy-load rounded" 
+                data-src="/file-raw/<%= item.name %>?path=<%= data.FolderPath %>" 
+                width="80" 
+                height="80">
+        </iframe>
+        <% } else if (['.zip', '.rar', '.7z', '.tar', '.gz', '.bz2', '.xz', '.tgz', '.tar.gz', '.tar.bz2', '.tar.xz'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+                data-src="/public/assets/icons/zip.png" 
+                width="80" 
+                height="80" 
+                alt="<%= item.name %>" />
+        <% } else if (['.xlsx', '.xls', '.csv', '.xlsm', '.xlsb', '.ods'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+                data-src="/public/assets/icons/msft-excel.png" 
+                width="80" 
+                height="80" 
+                alt="<%= item.name %>" />
+        <% } else if (['.docx', '.doc'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+                data-src="/public/assets/icons/msft-word.png" 
+                width="80" 
+                height="80" 
+                alt="<%= item.name %>" />
+        <% } else if (['.heic'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+                data-src="/public/assets/icons/heic.png" 
+                width="80" 
+                height="80" 
+                alt="<%= item.name %>" />
+        <% } else if (['.mp3', '.wav', '.ogg', '.flac', '.aac', '.m4a', '.wma', '.alac', '.aiff', '.opus', '.pcm', '.dsd'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+                data-src="/public/assets/icons/mp3.png" 
+                width="80" 
+                height="80" 
+                alt="<%= item.name %>" />
+        <% } else if (['.mov'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+                data-src="/public/assets/icons/mov.png" 
+                width="80" 
+                height="80" 
+                alt="<%= item.name %>" />
+        <% } else if (['.json'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+                data-src="/public/assets/icons/json.png" 
+                width="80" 
+                height="80" 
+                alt="<%= item.name %>" />
+        <% } else if (['.yaml'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+                data-src="/public/assets/icons/yaml.png" 
+                width="80" 
+                height="80" 
+                alt="<%= item.name %>" />
+        <% } else if (['.py'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+                data-src="/public/assets/icons/py.png" 
+                width="80" 
+                height="80" 
+                alt="<%= item.name %>" />
+        <% } else if (['.epub'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+                data-src="/public/assets/icons/epub.png" 
+                width="80" 
+                height="80" 
+                alt="<%= item.name %>" />
+        <% } else if (['.html'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+                data-src="/public/assets/icons/html.png" 
+                width="80" 
+                height="80" 
+                alt="<%= item.name %>" />
+        <% } else if (['.css'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+                data-src="/public/assets/icons/css.png" 
+                width="80" 
+                height="80" 
+                alt="<%= item.name %>" />
+        <% } else if (['.js'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+                data-src="/public/assets/icons/js.png" 
+                width="80" 
+                height="80" 
+                alt="<%= item.name %>" />
+        <% } else if (['.ovpn'].some(ext => item.name.toLowerCase().endsWith(ext))) { %>
+        <img class="lazy-load rounded" 
+                data-src="/public/assets/icons/openvpn.png" 
+                width="80" 
+                height="80" 
+                alt="<%= item.name %>" />
+      <% } else { %>
+        <i class="fas <%= item.isFolder ? 'fa-folder text-warning' : 'fa-file text-secondary' %> fa-3x me-3"></i>
+      <% } %>
+  
+      <!-- File/Folder Details -->
+      <div class="ms-3 flex-grow-1" <% if (item.isFolder) { %>
+        onclick="window.location.href='/files?path=<%= data.FolderPath %><%= item.name %>/'"
+    <% } else { %>
+        onclick="window.location.href='/viewer?path=<%= data.FolderPath %>&name=<%= item.name %>'"
+    <% } %>>
+        <strong><%= item.name %></strong>
+        <div class="text-muted small">
+          <span><strong>Size:</strong> <%= item.size %> MB</span> | 
+          <span><strong>Date:</strong> <%= new Date(item.createdAt).toLocaleString() %></span>
+        </div>
+      </div>
+  
+      <!-- Actions -->
+      <div>
+        <i
+          class="fas fa-cog text-secondary me-2"
+          style="cursor: pointer;"
+          onclick="FileFolderSettings('<%= data.FolderPath %>', '<%= item.name %>', '<%= JSON.stringify(item) %>')"
+          title="Settings"
+        ></i>
+      </div>
+    </li>
+    <% }) %>
+  </ul>  
+
+      <!-- Folder creation modal -->
+      <div
+        class="modal fade"
+        id="createFolderModal"
+        tabindex="-1"
+        aria-labelledby="createFolderModalLabel"
+        aria-hidden="true"
+        style="color: black;"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="createFolderModalLabel">
+                Create New Folder
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="createFolderForm">
+                <div class="mb-3">
+                  <label for="folderName" class="form-label">Folder Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="folderName"
+                    required
+                  />
+                </div>
+                <input
+                  type="hidden"
+                  id="currentPath"
+                  value="<%= data.FolderPath %>"
+                />
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                id="createFolderButton"
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <br><br>
+    <footer class="text-center">
+      <p>
+        Do not distribute without permission. <br>
+        <script>document.write(new Date().getFullYear())</script> AntoineDeveloper
+      </p>
+    </footer>
+
+    <br /><br /><br />
+    <script src="/public/assets/libraries/bootstrap.bundle.min.js"></script>
+
+    <script>
+//         const mediaElements = document.querySelectorAll('.lazy-load');
+
+// mediaElements.forEach(element => {
+//   // Find the parent element dynamically (can be any parent element)
+//   const parent = element.parentElement;
+
+//   parent.addEventListener('mouseenter', function() {
+//     // Only load the element if it doesn't have a src already
+//     if (element.tagName === 'IMG' && !element.src) {
+//       element.src = element.getAttribute('data-src');
+//     } else if (element.tagName === 'VIDEO' && !element.src) {
+//       element.src = element.getAttribute('data-src');
+//       const sources = element.querySelectorAll('source');
+//       sources.forEach(source => {
+//         source.src = source.getAttribute('data-src');
+//       });
+//       element.load();
+//     } else if (element.tagName === 'IFRAME' && !element.src) {
+//       element.src = element.getAttribute('data-src');
+//     }
+//   });
+// });
+
+// Create the Intersection Observer to observe when elements come into view
+const observer = new IntersectionObserver((entries, observer) => {
+  entries.forEach(entry => {
+    const element = entry.target;
+    
+    // If the element is in view (and it hasn't been loaded yet)
+    if (entry.isIntersecting && !element.src) {
+      // Load the element based on its tag name
+      if (element.tagName === 'IMG' && !element.src) {
+        element.src = element.getAttribute('data-src');
+      } else if (element.tagName === 'VIDEO' && !element.src) {
+        element.src = element.getAttribute('data-src');
+        const sources = element.querySelectorAll('source');
+        sources.forEach(source => {
+          source.src = source.getAttribute('data-src');
+        });
+        element.load();
+      } else if (element.tagName === 'IFRAME' && !element.src) {
+        element.src = element.getAttribute('data-src');
+      } else if (element.tagName === 'TEXT' && !element.src) {
+        element.src = element.getAttribute('data-src');
+      }
+      
+      // Once the element is loaded, stop observing it
+      observer.unobserve(element);
+    }
+  });
+}, {
+  root: null,        // Use the viewport as the root
+  rootMargin: '0px', // No margin around the root (viewport)
+  threshold: 0.1     // Load the element when 10% of it is visible
+});
+
+// Find all media elements with the lazy-load class
+const mediaElements = document.querySelectorAll('.lazy-load');
+
+// Observe each media element
+mediaElements.forEach(element => {
+  observer.observe(element);
+});
+
+      </script>
+    <script>
+        var TempItemJSON = {};
+        function FileFolderSettings(FolderPath, name, itemJSON) {
+            TempItemJSON = JSON.parse(itemJSON);
+            console.log(`"/permalink-raw/${TempItemJSON.owner}/${TempItemJSON._id}/${TempItemJSON.name}"`);
+            Swal.fire({
+                title: "File/Folder Settings",
+                html: `
+                <span style='font-size:10px;'>Path: ${FolderPath}<br>Name: ${name}</span>
+                <hr>
+                <button class='btn btn-primary' onclick='FileFolderSettings_Share("${FolderPath}", "${name}")'>Share</button>
+                <button class='btn btn-info' onclick='FileFolderSettings_Move("${FolderPath}", "${name}")'>Move</button>
+                <button class='btn btn-danger' onclick='FileFolderSettings_Delete("${FolderPath}", "${name}")'>Delete</button>
+                `,
+                showCancelButton: false,
+                confirmButtonText: "Close",
+            });
+        }
+
+        function FileFolderSettings_Share(FolderPath, name) {
+            Swal.fire({
+                title: "Sharing",
+                html: `
+                <span style='font-size:10px;'>Path: ${FolderPath}<br>Name: ${name}</span>
+                <hr>
+                <span><strong>Share to another user</strong></span>
+                <hr>
+                <span><strong>File permalink:</strong><br><a target="_blank" href="/permalink-raw/${TempItemJSON.owner}/${TempItemJSON._id}/${TempItemJSON.name}">/permalink-raw/${TempItemJSON.owner}/${TempItemJSON._id}/${TempItemJSON.name}</a></span>
+                `,
+                showCancelButton: false,
+                confirmButtonText: "Close",
+            });
+            TempItemJSON = {}; // Reset temp JSON
+        }
+
+        function FileFolderSettings_Delete(FolderPath, name) {
+            Swal.fire({
+                title: "Delete File/Folder",
+                html: `
+                <span style='font-size:10px;'>Path: ${FolderPath}<br>Name: ${name}</span>
+                <hr>
+                <button class='btn btn-primary' onclick='FileFolderSettings_Delete_API("${FolderPath}", "${name}")'>Yes, delete file/folder and all files in folder</button>
+                `,
+                footer: "If you are deleting a folder, it will delete all the files in the folder",
+                showCancelButton: false,
+                confirmButtonText: "Close",
+            });
+        }
+
+        function FileFolderSettings_Delete_API(FolderPath, name) {
+            // Create the request body
+            const requestBody = {
+                FolderPath: FolderPath,
+                FolderFileName: name,
+            };
+
+            // Send the POST request to the API
+            fetch("/api/delete", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json",
+                },
+                body: JSON.stringify(requestBody),
+            })
+                .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to delete the file or folder.");
+                }
+                return response.json();
+                })
+                .then((data) => {
+                console.log(data.message); // Handle success
+                alert("Deleted successfully!");
+                window.location.reload();
+                })
+                .catch((error) => {
+                console.error(error.message); // Handle errors
+                alert("Error: " + error.message);
+                });
+        }
+
+  function processFileFolderClick(element, url) {
+    console.log(element.classList);
+    if (element.classList.contains("DoNotClickLink")) {
+      return;
+    }
+
+    window.location.href = url;
+  }
+
+      function StartUploadProcess() {
+        Swal.fire({
+          title: "Select files to upload",
+          input: "file",
+          inputAttributes: {
+            multiple: true,
+          },
+          showCancelButton: true,
+          confirmButtonText: "Upload",
+          cancelButtonText: "Cancel",
+          preConfirm: (files) => {
+            if (!files || files.length === 0) {
+              Swal.showValidationMessage("Please select at least one file");
+              return false;
+            }
+            return files;
+          },
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            const files = result.value;
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+              formData.append("files", files[i]);
+            }
+            formData.append("path", "<%= data.FolderPath %>"); // Add the current folder path
+
+            // Create the upload progress Swal modal
+            const uploadSwal = Swal.fire({
+              title: "Uploading files...",
+              html: "Please wait while your files are being uploaded.",
+              timerProgressBar: true,
+              didOpen: () => {
+                Swal.showLoading();
+              },
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+            });
+
+            try {
+              const response = await fetch("/api/upload-files", {
+                method: "POST",
+                body: formData,
+              });
+
+              if (!response.ok) {
+                throw new Error("File upload failed");
+              }
+
+              // On success, reload the page or show a success message
+              Swal.fire(
+                "Success!",
+                "Files uploaded successfully!",
+                "success"
+              ).then(() => {
+                window.location.reload(); // Reload to refresh the file list
+              });
+            } catch (error) {
+              console.error("Upload Error:", error);
+              Swal.fire(
+                "Error",
+                "An error occurred while uploading your files.",
+                "error"
+              );
+            } finally {
+              uploadSwal.close();
+            }
+          }
+        });
+      }
+
+      function logout() {
+        // Delete the cookie
+        var cookieDate = new Date(); // current date & time
+        cookieDate.setTime(cookieDate.getTime() - 1);
+        document.cookie =
+          "NODEWEBCLOUD_TOKEN=; expires=" + cookieDate.toGMTString();
+
+        // Delete from localstorage
+        localStorage.removeItem("NODEWEBCLOUD_TOKEN");
+
+        window.location.href = "/login";
+      }
+
+      document
+        .getElementById("createFolderButton")
+        .addEventListener("click", async () => {
+          const folderName = document.getElementById("folderName").value;
+          const currentPath = document.getElementById("currentPath").value;
+
+          if (!folderName.trim()) {
+            alert("Folder name is required.");
+            return;
+          }
+
+          try {
+            const response = await fetch("/api/create-folder", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                folderName,
+                path: currentPath,
+              }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+            //   alert(result.message);
+              window.location.reload();
+            } else {
+              alert(result.error);
+            }
+          } catch (err) {
+            console.error("Error creating folder:", err);
+            alert("An error occurred. Please try again.");
+          }
+        });
+    </script>
+  </body>
+</html>

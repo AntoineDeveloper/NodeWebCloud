@@ -1,0 +1,13 @@
+{
+    "username": "username",
+    "fullname": "Fullname of user",
+    "email": "email@example.com",
+    "password": "SHA-256 OF PASSWORD",
+    "permissions": [
+      "user",
+      "admin"
+    ],
+    "lastLogin": 0,
+    "lockUntil": 0,
+    "loginAttempts": 0
+}
