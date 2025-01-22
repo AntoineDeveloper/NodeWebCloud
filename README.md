@@ -1,8 +1,8 @@
 # NodeWebCloud - Self-hosted File Server
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![License](https://img.shields.io/badge/license-AntoineDeveloper-blue)
 ![Version](https://img.shields.io/badge/version-1.0.0--ALPHA2-blue)
+![License](https://img.shields.io/badge/license-AntoineDeveloper-blue)
 
 ## Overview
 
